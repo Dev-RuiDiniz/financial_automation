@@ -10,10 +10,9 @@ financial_automation/
 │   ├── visualizer.py      # Gráficos Plotly
 │   ├── pdf_generator.py   # Relatório PDF
 │   ├── excel_generator.py
-│   ├── logger.py    
-│   └── main.py            # Pipeline principal
+│   └──logger.py    
 ├── tests/
-    ├── conftest.py
+│   ├── conftest.py
 │   └── test_reader.py
 ├── requirements.txt
 ├── README.md
