@@ -1,63 +1,35 @@
-from openpyxl import Workbook
-from openpyxl.styles import Font
-from openpyxl.worksheet.table import Table, TableStyleInfo
+import pandas as pd
 from pathlib import Path
+from openpyxl import Workbook
+from src.logger import get_logger
 
-def generate_excel(df, output_path: str):
+logger = get_logger()
+
+def generate_excel_report(df: pd.DataFrame, reports_path: str):
     """
-    Salva o DataFrame consolidado em um Excel formatado.
-    - Cria aba 'Consolidado'
-    - Cabeçalho em negrito
-    - Insere dados linha a linha
-    - Ajusta largura das colunas automaticamente
-    - Formata como tabela
+    Gera um relatório Excel consolidado.
     """
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_dir = Path(reports_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Consolidado"
+    output_file = output_dir / "relatorio_financeiro.xlsx"
 
-    # --- Cabeçalho ---
-    headers = list(df.columns)
-    ws.append(headers)
+    try:
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Relatório"
 
-    for cell in ws[1]:
-        cell.font = Font(bold=True)
+        # Cabeçalho
+        ws.append(df.columns.tolist())
 
-    # --- Dados ---
-    for _, row in df.iterrows():
-        ws.append(list(row.values))
+        # Linhas
+        for _, row in df.iterrows():
+            ws.append(row.tolist())
 
-    # --- Ajuste de largura ---
-    for col in ws.columns:
-        max_length = 0
-        col_letter = col[0].column_letter
-        for cell in col:
-            try:
-                cell_value = str(cell.value)
-                if len(cell_value) > max_length:
-                    max_length = len(cell_value)
-            except:
-                pass
-        ws.column_dimensions[col_letter].width = max_length + 2
+        wb.save(output_file)
 
-    # --- Criar tabela ---
-    table_range = f"A1:{ws.cell(row=ws.max_row, column=ws.max_column).coordinate}"
-    table = Table(displayName="TabelaConsolidada", ref=table_range)
+        logger.info(f"Relatório Excel gerado: {output_file}")
 
-    style = TableStyleInfo(
-        name="TableStyleMedium9",
-        showFirstColumn=False,
-        showLastColumn=False,
-        showRowStripes=True,
-        showColumnStripes=False,
-    )
-
-    table.tableStyleInfo = style
-    ws.add_table(table)
-
-    # --- Salvar arquivo ---
-    wb.save(output_path)
-    print(f"✔ Excel gerado em: {output_path}")
+    except Exception as e:
+        logger.error(f"Erro ao gerar relatório Excel: {e}")
+        raise

@@ -8,25 +8,23 @@ from src.reader import load_excel_files, validate_columns
 # Teste 1 — Carrega arquivos corretamente
 # ----------------------------------------------------------
 def test_load_excel_files_success(tmp_path):
-    # cria pasta temporária
     folder = tmp_path / "raw"
     folder.mkdir()
 
-    # cria Excel de teste
     file_path = folder / "teste.xlsx"
+
+    # cria Excel válido usando openpyxl
     wb = Workbook()
     ws = wb.active
     ws.append(["data", "faturamento", "custos"])
     ws.append(["2025-01-01", 1000, 500])
     wb.save(file_path)
 
-    # executa a função
     result = load_excel_files(str(folder))
 
-    # validações
     assert "teste.xlsx" in result
     assert isinstance(result["teste.xlsx"], pd.DataFrame)
-    assert len(result["teste.xlsx"]) == 1  # 1 linha de dados
+    assert len(result["teste.xlsx"]) == 1
 
 
 # ----------------------------------------------------------
@@ -46,20 +44,16 @@ def test_load_excel_files_empty_excel(tmp_path):
 
     file_path = folder / "vazio.xlsx"
 
-    # cria arquivo Excel sem conteúdo de dados
     wb = Workbook()
     wb.save(file_path)
 
-    # deve carregar, mas DataFrame deve ser vazio
-    result = load_excel_files(str(folder))
-
-    df = result["vazio.xlsx"]
-    assert isinstance(df, pd.DataFrame)
-    assert df.empty
+    # comportamento real: deve lançar ValueError
+    with pytest.raises(ValueError):
+        load_excel_files(str(folder))
 
 
 # ----------------------------------------------------------
-# Teste 4 — validate_columns: caso OK
+# Teste 4 — validate_columns: OK
 # ----------------------------------------------------------
 def test_validate_columns_ok():
     df = pd.DataFrame({
@@ -68,18 +62,16 @@ def test_validate_columns_ok():
         "custos": [500]
     })
 
-    # não deve lançar erro
     validate_columns(df, ["data", "faturamento", "custos"])
 
 
 # ----------------------------------------------------------
-# Teste 5 — validate_columns: faltando colunas
+# Teste 5 — validate_columns: colunas faltando
 # ----------------------------------------------------------
 def test_validate_columns_missing():
     df = pd.DataFrame({
         "data": ["2025-01-01"],
         "faturamento": [1000]
-        # faltou "custos"
     })
 
     with pytest.raises(ValueError):

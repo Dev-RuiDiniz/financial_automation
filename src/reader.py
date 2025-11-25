@@ -1,51 +1,60 @@
+import os
 import pandas as pd
-from pathlib import Path
+from openpyxl import load_workbook
+from src.logger import get_logger
 
+logger = get_logger()
 
-def load_excel_files(path: str) -> dict:
+def load_excel_files(folder_path: str) -> dict:
     """
-    Lê todos os arquivos .xlsx de um diretório e retorna
-    um dicionário no formato:
-    {
-        "arquivo.xlsx": DataFrame,
-        ...
-    }
+    Carrega todos os arquivos .xlsx de uma pasta.
+    Retorna um dicionário: {nome_arquivo: DataFrame}
     """
-    directory = Path(path)
+    if not os.path.exists(folder_path):
+        logger.error(f"Diretório não encontrado: {folder_path}")
+        raise FileNotFoundError(f"Pasta não encontrada: {folder_path}")
 
-    if not directory.exists():
-        raise FileNotFoundError(f"Diretório não encontrado: {directory}")
+    files = [f for f in os.listdir(folder_path) if f.endswith(".xlsx")]
 
-    excel_files = list(directory.glob("*.xlsx"))
+    if not files:
+        logger.warning("Nenhum arquivo Excel encontrado no diretório.")
 
-    if not excel_files:
-        raise FileNotFoundError("Nenhum arquivo .xlsx encontrado no diretório informado.")
+    result = {}
 
-    dataframes = {}
+    for file in files:
+        full_path = os.path.join(folder_path, file)
 
-    for file in excel_files:
         try:
-            df = pd.read_excel(file)
+            wb = load_workbook(full_path, data_only=True)
+            sheet = wb.active
+            rows = list(sheet.values)
 
-            # Agora arquivos vazios são permitidos
-            dataframes[file.name] = df
+            if not rows or len(rows) < 2:
+                logger.warning(f"Arquivo vazio ou sem dados: {file}")
+                df = pd.DataFrame()
+            else:
+                header = rows[0]
+                data = rows[1:]
+                df = pd.DataFrame(data, columns=header)
+
+            result[file] = df
+            logger.info(f"Carregado: {file} ({len(df)} linhas)")
 
         except Exception as e:
-            raise ValueError(f"Erro ao ler '{file.name}': {e}")
+            logger.error(f"Erro ao carregar {file}: {e}")
+            raise
 
-    return dataframes
+    return result
 
 
-def validate_columns(df: pd.DataFrame, required_columns: list):
+def validate_columns(df: pd.DataFrame, required_cols: list):
     """
-    Valida se o DataFrame possui todas as colunas obrigatórias.
-    Exemplo de uso:
-
-    validate_columns(df, ["data", "faturamento", "custos"])
+    Verifica se o DataFrame contém todas as colunas necessárias.
     """
-    missing = [col for col in required_columns if col not in df.columns]
+    missing = [col for col in required_cols if col not in df.columns]
 
     if missing:
-        raise ValueError(f"Colunas ausentes no DataFrame: {missing}")
+        logger.error(f"Colunas faltando: {missing}")
+        raise ValueError(f"Colunas faltando: {missing}")
 
-    return True
+    logger.info("Colunas validadas com sucesso.")

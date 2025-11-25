@@ -1,0 +1,8 @@
+2025-11-25 11:56:47,664 [INFO] Iniciando processamento financeiro...
+2025-11-25 11:56:47,679 [INFO] config.yaml carregado com sucesso.
+2025-11-25 11:56:47,712 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 11:56:47,712 [INFO] 1 arquivos carregados.
+2025-11-25 11:56:47,715 [INFO] Colunas validadas com sucesso.
+2025-11-25 11:56:47,715 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 11:56:47,749 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
+2025-11-25 11:56:47,749 [INFO] Processamento concluído com sucesso.

@@ -1,74 +1,43 @@
-import os
-import sys
-import yaml
-from pathlib import Path
-
+import pandas as pd
 from src.reader import load_excel_files, validate_columns
-from src.transformer import consolidate_data, calculate_metrics
-from src.visualizer import generate_plot
-from src.pdf_generator import generate_pdf
-from src.excel_generator import generate_excel
+from src.excel_generator import generate_excel_report
+from src.logger import get_logger
+import yaml
 
-sys.stdout.reconfigure(encoding="utf-8")
+logger = get_logger()
 
+def main():
+    logger.info("Iniciando processamento financeiro...")
 
-def load_config():
-    """Carrega o arquivo config.yaml com validação."""
-    config_path = Path("config.yaml")
+    # Carrega config.yaml
+    try:
+        config = yaml.safe_load(open("config.yaml"))
+        raw_path = config["paths"]["raw"]
+        reports_path = config["paths"]["reports"]
+        required_columns = config["columns"]["required"]
+        logger.info("config.yaml carregado com sucesso.")
+    except Exception as e:
+        logger.error(f"Erro ao carregar config.yaml: {e}")
+        raise
 
-    if not config_path.exists():
-        raise FileNotFoundError("Arquivo config.yaml não encontrado na raiz do projeto.")
+    # Carregar arquivos
+    files = load_excel_files(raw_path)
+    logger.info(f"{len(files)} arquivos carregados.")
 
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def run_pipeline():
-    print("⚙️ Carregando configuração...")
-    config = load_config()
-
-    raw_path = Path(config["paths"]["raw"])
-    reports_path = Path(config["paths"]["reports"])
-    required_columns = config["columns"]["required"]
-
-    reports_path.mkdir(parents=True, exist_ok=True)
-
-    print("📥 Carregando arquivos Excel...")
-    dfs = load_excel_files(raw_path)
-    print(f"✔ {len(dfs)} arquivos carregados.")
-
-    print("🔍 Validando colunas essenciais...")
-    for name, df in dfs.items():
+    # Validar e consolidar
+    dfs = []
+    for name, df in files.items():
         validate_columns(df, required_columns)
-        print(f"✔ {name} validado.")
+        dfs.append(df)
+        logger.info(f"Arquivo validado: {name}")
 
-    print("🧩 Consolidando DataFrames...")
-    df_final = consolidate_data(dfs)
-    print(f"✔ Dados consolidados: {len(df_final)} linhas.")
+    df_final = pd.concat(dfs, ignore_index=True)
 
-    print("📊 Calculando métricas...")
-    metrics = calculate_metrics(df_final)
+    # Gerar relatório Excel
+    generate_excel_report(df_final, reports_path)
 
-    for k, v in metrics.items():
-        print(f"  - {k}: {v}")
-
-    print("📈 Gerando gráfico...")
-    chart_path = reports_path / "grafico_financeiro.png"
-    generate_plot(df_final, str(chart_path))
-    print(f"✔ Gráfico salvo em: {chart_path}")
-
-    print("📄 Gerando PDF...")
-    pdf_path = reports_path / "relatorio_financeiro.pdf"
-    generate_pdf(metrics, str(chart_path), str(pdf_path))
-    print(f"✔ PDF gerado em: {pdf_path}")
-
-    print("📊 Salvando Excel consolidado...")
-    excel_path = reports_path / "relatorio.xlsx"
-    generate_excel(df_final, str(excel_path))
-    print(f"✔ Excel salvo em: {excel_path}")
-
-    print("\n🎉 Pipeline concluído com sucesso!")
+    logger.info("Processamento concluído com sucesso.")
 
 
 if __name__ == "__main__":
-    run_pipeline()
+    main()
