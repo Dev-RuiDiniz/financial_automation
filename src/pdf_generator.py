@@ -1,9 +1,7 @@
 import os
 from datetime import datetime
 
-import pandas as pd
-import plotly.express as px
-
+# Removida a dependência do plotly aqui, pois o gráfico vem como imagem
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -22,61 +20,28 @@ from src.logger import get_logger
 logger = get_logger()
 
 
-# -------------------------------------------------------------------
-# Função auxiliar: gera o gráfico financeiro automaticamente
-# -------------------------------------------------------------------
-def generate_financial_chart(df: pd.DataFrame, output_path: str) -> str:
-    """
-    Gera um gráfico PNG com base no DataFrame fornecido.
-    X: data
-    Y: faturamento
-
-    Retorna o caminho do PNG gerado.
-    """
-    logger.info("Gerando gráfico financeiro (Plotly)...")
-
-    if "data" not in df.columns or "faturamento" not in df.columns:
-        raise ValueError("Colunas 'data' e 'faturamento' são necessárias para o gráfico.")
-
-    fig = px.line(df, x="data", y="faturamento", title="Faturamento ao longo do tempo")
-
-    chart_path = os.path.join(output_path, "grafico_financeiro.png")
-    fig.write_image(chart_path)
-
-    logger.info(f"Gráfico gerado em: {chart_path}")
-    return chart_path
-
-
-# -------------------------------------------------------------------
-# Função principal: PDF avançado
-# -------------------------------------------------------------------
 def generate_pdf_report_advanced(
-    df: pd.DataFrame,
     metrics: dict,
     output_path: str,
+    chart_path: str = None,
     logo_path: str = None
 ):
     """
     Gera um PDF profissional contendo:
     - Cabeçalho com logo (opcional)
     - Tabela de métricas
-    - Gráfico centralizado
+    - Imagem do gráfico (gerado previamente pelo visualizer)
     - Rodapé com data
-
-    df: DataFrame consolidado
-    metrics: dicionário com indicadores financeiros
-    output_path: pasta destino
     """
     logger.info("Iniciando geração do PDF avançado...")
 
-    os.makedirs(output_path, exist_ok=True)
-    pdf_path = os.path.join(output_path, "relatorio_financeiro.pdf")
-
-    # Gera o gráfico automaticamente
-    chart_path = generate_financial_chart(df, output_path)
+    # Garante que o diretório de saída existe
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Documento PDF
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
+    doc = SimpleDocTemplate(output_path, pagesize=A4)
     story = []
     styles = getSampleStyleSheet()
 
@@ -86,7 +51,9 @@ def generate_pdf_report_advanced(
     if logo_path and os.path.exists(logo_path):
         story.append(Image(logo_path, width=120, height=60))
     else:
-        story.append(Paragraph("<b>Relatório Financeiro Consolidado</b>", styles["Title"]))
+        title_style = styles["Title"]
+        title_style.alignment = 1  # Center
+        story.append(Paragraph("<b>Relatório Financeiro Consolidado</b>", title_style))
 
     story.append(Spacer(1, 20))
 
@@ -101,6 +68,7 @@ def generate_pdf_report_advanced(
         ["Lucro Percentual", f"{metrics['lucro_percentual']}%"],
     ]
 
+    # Estilização da Tabela
     table = Table(data, colWidths=[7 * cm, 7 * cm])
     table.setStyle(
         TableStyle(
@@ -112,23 +80,28 @@ def generate_pdf_report_advanced(
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.gray),
                 ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
                 ("FONTSIZE", (0, 0), (-1, -1), 11),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                ("TOPPADDING", (0, 0), (-1, -1), 10),
             ]
         )
     )
 
     story.append(table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 25))
 
     # ------------------------------------------------------
-    # 3) Gráfico centralizado
+    # 3) Gráfico (Inserção da Imagem)
     # ------------------------------------------------------
-    story.append(Paragraph("<b>Desempenho Financeiro</b>", styles["Heading2"]))
+    story.append(Paragraph("<b>Desempenho Financeiro (Gráfico)</b>", styles["Heading2"]))
     story.append(Spacer(1, 10))
 
-    if os.path.exists(chart_path):
-        story.append(Image(chart_path, width=15 * cm, height=9 * cm))
+    if chart_path and os.path.exists(chart_path):
+        # Ajusta tamanho da imagem proporcionalmente
+        img = Image(chart_path, width=16 * cm, height=9 * cm)
+        story.append(img)
     else:
-        logger.warning(f"Gráfico não encontrado: {chart_path}")
+        logger.warning(f"Gráfico não encontrado no caminho: {chart_path}")
+        story.append(Paragraph("<i>Gráfico indisponível no momento.</i>", styles["Normal"]))
 
     story.append(Spacer(1, 20))
 
@@ -136,16 +109,19 @@ def generate_pdf_report_advanced(
     # 4) Rodapé com data e hora
     # ------------------------------------------------------
     data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
-    story.append(Paragraph(f"<i>Relatório gerado em {data_atual}</i>", styles["Normal"]))
+    footer_style = styles["Normal"]
+    footer_style.fontSize = 8
+    footer_style.textColor = colors.gray
+    
+    story.append(Spacer(1, 30))
+    story.append(Paragraph(f"Relatório gerado automaticamente em {data_atual}", footer_style))
 
     # ------------------------------------------------------
     # Finalização do PDF
     # ------------------------------------------------------
     try:
         doc.build(story)
-        logger.info(f"PDF avançado gerado com sucesso em: {pdf_path}")
+        logger.info(f"PDF gerado com sucesso em: {output_path}")
     except Exception as e:
         logger.error(f"Erro ao gerar PDF: {e}")
         raise
-
-    return pdf_path

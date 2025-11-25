@@ -51,6 +51,7 @@ def consolidate(dfs: list[pd.DataFrame]) -> pd.DataFrame:
     if "data" in df.columns:
         df["data"] = pd.to_datetime(df["data"], errors="coerce")
 
+    # Remove linhas que não tenham data ou faturamento
     df.dropna(subset=["data", "faturamento"], inplace=True)
 
     logger.info(f"Consolidação concluída: {len(df)} linhas finais.")
@@ -90,20 +91,23 @@ def calculate_metrics(df: pd.DataFrame) -> dict:
 
 
 # -----------------------------------------------------------
-# 4) Preparação de dados para o gráfico (Plotly)
+# 4) Preparação de dados para o gráfico
 # -----------------------------------------------------------
 def prepare_chart_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Prepara dados agregados para gráfico:
-    - Agrupa faturamento por dia
+    - Agrupa faturamento e custos por dia
     """
     logger.info("Preparando dados para gráfico financeiro...")
 
-    if "data" not in df.columns or "faturamento" not in df.columns:
-        raise ValueError("Colunas 'data' e 'faturamento' são obrigatórias.")
+    required = ["data", "faturamento", "custos"]
+    for col in required:
+        if col not in df.columns:
+            raise ValueError(f"Coluna obrigatória faltando para o gráfico: {col}")
 
+    # CORREÇÃO: Agora agrupa faturamento E custos
     df_chart = (
-        df.groupby("data")["faturamento"]
+        df.groupby("data")[["faturamento", "custos"]]
         .sum()
         .reset_index()
         .sort_values("data")

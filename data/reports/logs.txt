@@ -41,3 +41,38 @@
 2025-11-25 12:21:58,250 [INFO] 3 pontos de dados gerados para o gráfico.
 2025-11-25 12:21:58,299 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
 2025-11-25 12:21:59,828 [ERROR] Erro crítico: 'custos'
+2025-11-25 12:37:41,018 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:37:41,020 [INFO] config.yaml carregado com sucesso.
+2025-11-25 12:37:41,043 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 12:37:41,044 [INFO] 1 arquivos carregados.
+2025-11-25 12:37:41,044 [INFO] Colunas validadas com sucesso.
+2025-11-25 12:37:41,044 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 12:37:41,045 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 12:37:41,056 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 12:37:41,056 [INFO] Calculando métricas financeiras...
+2025-11-25 12:37:41,057 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 12:37:41,057 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 12:37:41,071 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 12:37:41,104 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 12:37:41,615 [ERROR] Erro crítico: 'charmap' codec can't encode character '\u2714' in position 0: character maps to <undefined>
+2025-11-25 12:39:11,508 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:39:11,510 [INFO] config.yaml carregado com sucesso.
+2025-11-25 12:39:11,525 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 12:39:11,526 [INFO] 1 arquivos carregados.
+2025-11-25 12:39:11,526 [INFO] Colunas validadas com sucesso.
+2025-11-25 12:39:11,526 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 12:39:11,527 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 12:39:11,539 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 12:39:11,539 [INFO] Calculando métricas financeiras...
+2025-11-25 12:39:11,539 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 12:39:11,540 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 12:39:11,544 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 12:39:11,574 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 12:39:12,119 [INFO] Grafico salvo em: data\reports\grafico_financeiro.png
+2025-11-25 12:39:12,120 [INFO] Gráfico gerado: data/reports/grafico_financeiro.png
+2025-11-25 12:39:12,164 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
+2025-11-25 12:39:12,164 [INFO] Relatório Excel gerado: data/reports/relatorio_financeiro.xlsx
+2025-11-25 12:39:12,164 [INFO] Iniciando geração do PDF avançado...
+2025-11-25 12:39:12,244 [INFO] PDF gerado com sucesso em: data/reports/relatorio_financeiro.pdf
+2025-11-25 12:39:12,245 [INFO] PDF gerado com sucesso.
+2025-11-25 12:39:12,245 [INFO] Processamento concluído com sucesso.

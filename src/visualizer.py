@@ -1,6 +1,9 @@
-# visualizer.py
 import matplotlib.pyplot as plt
 from pathlib import Path
+from src.logger import get_logger
+
+# Instancia o logger para manter o padrão dos logs
+logger = get_logger()
 
 def generate_plot(df, output_path: str):
     """
@@ -32,4 +35,5 @@ def generate_plot(df, output_path: str):
     plt.savefig(out, format="png")
     plt.close()
 
-    print(f"✔ Gráfico salvo em: {out}")
+    # CORREÇÃO: Usamos logger.info e removemos o emoji '✔' que quebrava no Windows
+    logger.info(f"Grafico salvo em: {out}")
