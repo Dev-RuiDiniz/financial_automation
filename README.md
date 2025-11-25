@@ -1,11 +1,13 @@
 ## 📊 Automação de Relatórios Financeiros
 
 Automação completa para leitura, validação e consolidação de planilhas financeiras, incluindo geração de métricas, gráficos, relatórios em PDF e exportação final em Excel.
+
 ---
 ## 📝 Descrição
 
 Este projeto automatiza todo o fluxo de criação de relatórios financeiros, desde a ingestão de arquivos Excel até a produção final de gráficos e PDFs consolidados.
 Ideal para operações repetitivas, rotinas contábeis, controle de vendas e auditorias internas.
+
 ---
 ## 🚀 Tecnologias Utilizadas
 
