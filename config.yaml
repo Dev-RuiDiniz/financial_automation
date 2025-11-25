@@ -1,0 +1,9 @@
+paths:
+  raw: data/raw
+  reports: data/reports
+
+columns:
+  required:
+    - data
+    - faturamento
+    - custos
