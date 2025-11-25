@@ -1,11 +1,14 @@
 import os
+import sys
+from pathlib import Path
+
 from src.reader import load_excel_files, validate_columns
 from src.transformer import consolidate_data, calculate_metrics
 from src.visualizer import generate_plot
 from src.pdf_generator import generate_pdf
-from pathlib import Path
-import sys
+from src.excel_generator import generate_excel
 
+# Garantir impressão de emojis no Windows
 sys.stdout.reconfigure(encoding='utf-8')
 
 def run_pipeline():
@@ -49,6 +52,11 @@ def run_pipeline():
     pdf_path = reports_dir / "relatorio_financeiro.pdf"
     generate_pdf(metrics, str(chart_path), str(pdf_path))
     print(f"✔ PDF gerado em: {pdf_path}")
+
+    print("📊 Gerando Excel consolidado...")
+    excel_path = reports_dir / "relatorio.xlsx"
+    generate_excel(df_final, str(excel_path))
+    print(f"✔ Excel gerado em: {excel_path}")
 
     print("\n🎉 Pipeline concluído com sucesso!")
 

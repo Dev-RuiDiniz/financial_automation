@@ -27,9 +27,7 @@ def load_excel_files(path: str) -> dict:
         try:
             df = pd.read_excel(file)
 
-            if df.empty:
-                raise ValueError(f"O arquivo está vazio: {file.name}")
-
+            # Agora arquivos vazios são permitidos
             dataframes[file.name] = df
 
         except Exception as e:
@@ -42,7 +40,7 @@ def validate_columns(df: pd.DataFrame, required_columns: list):
     """
     Valida se o DataFrame possui todas as colunas obrigatórias.
     Exemplo de uso:
-    
+
     validate_columns(df, ["data", "faturamento", "custos"])
     """
     missing = [col for col in required_columns if col not in df.columns]
