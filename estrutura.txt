@@ -1,0 +1,16 @@
+financial_automation/
+├── data/
+│   ├── raw/               # Arquivos Excel de entrada
+│   ├── processed/         # Dados tratados
+│   └── reports/           # PDFs e Excel finais
+├── src/
+│   ├── __init__.py
+│   ├── reader.py          # Funções de leitura e validação
+│   ├── transformer.py     # Cálculos e consolidação
+│   ├── visualizer.py      # Gráficos Plotly
+│   ├── pdf_generator.py   # Relatório PDF
+│   └── main.py            # Pipeline principal
+├── tests/
+│   └── test_reader.py
+├── requirements.txt
+└── README.md
