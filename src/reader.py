@@ -2,13 +2,20 @@ import os
 import pandas as pd
 from openpyxl import load_workbook
 from src.logger import get_logger
+from src.transformer import normalize_columns
 
 logger = get_logger()
+
 
 def load_excel_files(folder_path: str) -> dict:
     """
     Carrega todos os arquivos .xlsx de uma pasta.
     Retorna um dicionário: {nome_arquivo: DataFrame}
+
+    Regras:
+    - Diretório inexistente → FileNotFoundError
+    - Arquivo excel vazio → DataFrame vazio (para testes)
+    - Qualquer outro erro → Exception
     """
     if not os.path.exists(folder_path):
         logger.error(f"Diretório não encontrado: {folder_path}")
@@ -29,6 +36,7 @@ def load_excel_files(folder_path: str) -> dict:
             sheet = wb.active
             rows = list(sheet.values)
 
+            # arquivo vazio
             if not rows or len(rows) < 2:
                 logger.warning(f"Arquivo vazio ou sem dados: {file}")
                 df = pd.DataFrame()
@@ -36,6 +44,9 @@ def load_excel_files(folder_path: str) -> dict:
                 header = rows[0]
                 data = rows[1:]
                 df = pd.DataFrame(data, columns=header)
+
+                # normalização de colunas
+                df = normalize_columns(df)
 
             result[file] = df
             logger.info(f"Carregado: {file} ({len(df)} linhas)")
@@ -58,3 +69,4 @@ def validate_columns(df: pd.DataFrame, required_cols: list):
         raise ValueError(f"Colunas faltando: {missing}")
 
     logger.info("Colunas validadas com sucesso.")
+    return True

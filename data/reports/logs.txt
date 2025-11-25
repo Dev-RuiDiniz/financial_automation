@@ -6,3 +6,38 @@
 2025-11-25 11:56:47,715 [INFO] Arquivo validado: teste_financeiro.xlsx
 2025-11-25 11:56:47,749 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
 2025-11-25 11:56:47,749 [INFO] Processamento concluído com sucesso.
+2025-11-25 12:17:29,742 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:17:29,744 [ERROR] Erro ao carregar config.yaml: 'processed'
+2025-11-25 12:17:29,744 [ERROR] Erro crítico: 'processed'
+2025-11-25 12:18:32,277 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:18:32,291 [ERROR] Erro ao carregar config.yaml: 'layout'
+2025-11-25 12:18:32,291 [ERROR] Erro crítico: 'layout'
+2025-11-25 12:19:42,519 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:19:42,521 [ERROR] Erro ao carregar config.yaml: 'layout'
+2025-11-25 12:19:42,521 [ERROR] Erro crítico: 'layout'
+2025-11-25 12:20:11,373 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:20:11,376 [INFO] config.yaml carregado com sucesso.
+2025-11-25 12:20:11,399 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 12:20:11,399 [INFO] 1 arquivos carregados.
+2025-11-25 12:20:11,400 [ERROR] Colunas faltando: ['categoria', 'valor']
+2025-11-25 12:20:11,401 [ERROR] Erro crítico: Colunas faltando: ['categoria', 'valor']
+2025-11-25 12:20:20,632 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:20:20,634 [INFO] config.yaml carregado com sucesso.
+2025-11-25 12:20:20,651 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 12:20:20,651 [INFO] 1 arquivos carregados.
+2025-11-25 12:20:20,652 [ERROR] Colunas faltando: ['categoria', 'valor']
+2025-11-25 12:20:20,652 [ERROR] Erro crítico: Colunas faltando: ['categoria', 'valor']
+2025-11-25 12:21:58,166 [INFO] Iniciando processamento financeiro...
+2025-11-25 12:21:58,180 [INFO] config.yaml carregado com sucesso.
+2025-11-25 12:21:58,198 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 12:21:58,199 [INFO] 1 arquivos carregados.
+2025-11-25 12:21:58,199 [INFO] Colunas validadas com sucesso.
+2025-11-25 12:21:58,199 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 12:21:58,199 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 12:21:58,231 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 12:21:58,231 [INFO] Calculando métricas financeiras...
+2025-11-25 12:21:58,232 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 12:21:58,233 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 12:21:58,250 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 12:21:58,299 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 12:21:59,828 [ERROR] Erro crítico: 'custos'

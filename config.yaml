@@ -1,6 +1,7 @@
 paths:
-  raw: data/raw
-  reports: data/reports
+  raw: "data/raw"
+  processed: "data/processed"
+  reports: "data/reports"
 
 columns:
   required:

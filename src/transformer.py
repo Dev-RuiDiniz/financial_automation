@@ -1,52 +1,133 @@
 import pandas as pd
+from src.logger import get_logger
+
+logger = get_logger()
 
 
-def consolidate_data(dataframes: dict) -> pd.DataFrame:
+# -----------------------------------------------------------
+# 1) Normalização inteligente de colunas
+# -----------------------------------------------------------
+def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Recebe um dicionário:
-        {"arquivo.xlsx": df, ...}
-    Consolida todos os DataFrames em um único DataFrame final.
-    - Converte a coluna 'data' para datetime
-    - Remove registros com valores nulos críticos
+    Normaliza nomes de colunas:
+    - Remove espaços
+    - Converte para minúsculas
+    - Troca espaços por underline
     """
-    if not dataframes:
-        raise ValueError("Nenhum DataFrame fornecido para consolidação.")
-
-    # Junta todos os dataframes
-    df = pd.concat(dataframes.values(), ignore_index=True)
-
-    # Conversão de datas
-    if "data" in df.columns:
-        df["data"] = pd.to_datetime(df["data"], errors="coerce")
-
-    # Remove registros com dados essenciais faltando
-    df = df.dropna(subset=["data", "faturamento", "custos"])
-
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.lower()
+        .str.replace(" ", "_")
+    )
     return df
 
 
+# -----------------------------------------------------------
+# 2) Consolidação dos DataFrames
+# -----------------------------------------------------------
+def consolidate(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    """
+    Consolida vários DataFrames em um único DataFrame final.
+    Remoção de valores inválidos, normalização e limpeza.
+    """
+    logger.info("Iniciando consolidação dos DataFrames...")
+
+    if not dfs:
+        raise ValueError("Nenhum DataFrame fornecido para consolidação.")
+
+    df = pd.concat(dfs, ignore_index=True)
+
+    # Normalizar colunas
+    df = normalize_columns(df)
+
+    # Converter numéricos
+    cols_num = ["faturamento", "custos", "lucro"]
+    for c in cols_num:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # Converter datas
+    if "data" in df.columns:
+        df["data"] = pd.to_datetime(df["data"], errors="coerce")
+
+    df.dropna(subset=["data", "faturamento"], inplace=True)
+
+    logger.info(f"Consolidação concluída: {len(df)} linhas finais.")
+    return df
+
+
+# -----------------------------------------------------------
+# 3) Cálculo de métricas financeiras
+# -----------------------------------------------------------
 def calculate_metrics(df: pd.DataFrame) -> dict:
     """
-    Calcula métricas:
-    - faturamento_total
-    - custos_totais
-    - lucro_total
-    - lucro_percentual
+    Calcula métricas financeiras:
+    - Faturamento total
+    - Custos totais
+    - Lucro total
+    - Lucro percentual
     """
+    logger.info("Calculando métricas financeiras...")
+
     faturamento_total = df["faturamento"].sum()
     custos_totais = df["custos"].sum()
-
     lucro_total = faturamento_total - custos_totais
 
     lucro_percentual = (
-        (lucro_total / faturamento_total) * 100
-        if faturamento_total != 0
-        else 0
+        (lucro_total / faturamento_total) * 100 if faturamento_total > 0 else 0
     )
 
-    return {
-        "faturamento_total": faturamento_total,
-        "custos_totais": custos_totais,
-        "lucro_total": lucro_total,
-        "lucro_percentual": round(lucro_percentual, 2),
+    metrics = {
+        "faturamento_total": round(float(faturamento_total), 2),
+        "custos_totais": round(float(custos_totais), 2),
+        "lucro_total": round(float(lucro_total), 2),
+        "lucro_percentual": round(float(lucro_percentual), 2),
     }
+
+    logger.info(f"Métricas calculadas: {metrics}")
+    return metrics
+
+
+# -----------------------------------------------------------
+# 4) Preparação de dados para o gráfico (Plotly)
+# -----------------------------------------------------------
+def prepare_chart_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Prepara dados agregados para gráfico:
+    - Agrupa faturamento por dia
+    """
+    logger.info("Preparando dados para gráfico financeiro...")
+
+    if "data" not in df.columns or "faturamento" not in df.columns:
+        raise ValueError("Colunas 'data' e 'faturamento' são obrigatórias.")
+
+    df_chart = (
+        df.groupby("data")["faturamento"]
+        .sum()
+        .reset_index()
+        .sort_values("data")
+    )
+
+    logger.info(f"{len(df_chart)} pontos de dados gerados para o gráfico.")
+    return df_chart
+
+
+# -----------------------------------------------------------
+# 5) Função completa de processamento
+# -----------------------------------------------------------
+def process_pipeline(dfs: list[pd.DataFrame]):
+    """
+    Executa todo o processamento:
+    1. Consolida os DataFrames
+    2. Calcula métricas
+    3. Prepara dados para gráfico
+
+    Retorna:
+      df_final, metrics, chart_data
+    """
+    df_final = consolidate(dfs)
+    metrics = calculate_metrics(df_final)
+    chart_data = prepare_chart_data(df_final)
+
+    return df_final, metrics, chart_data
