@@ -97,3 +97,66 @@
 2025-11-25 15:05:07,948 [INFO] PDF gerado com sucesso em: data/reports/relatorio_financeiro.pdf
 2025-11-25 15:05:07,948 [INFO] PDF gerado com sucesso.
 2025-11-25 15:05:07,949 [INFO] Processamento concluído com sucesso.
+2025-11-25 15:11:51,344 [INFO] Iniciando processamento financeiro...
+2025-11-25 15:11:51,347 [INFO] config.yaml carregado com sucesso.
+2025-11-25 15:11:51,383 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 15:11:51,384 [INFO] 1 arquivos carregados.
+2025-11-25 15:11:51,384 [INFO] Colunas validadas com sucesso.
+2025-11-25 15:11:51,384 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 15:11:51,385 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 15:11:51,404 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 15:11:51,407 [INFO] Calculando métricas financeiras...
+2025-11-25 15:11:51,408 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 15:11:51,408 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 15:11:51,415 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 15:11:51,464 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 15:11:52,068 [INFO] Grafico salvo em: data\reports\grafico_financeiro.png
+2025-11-25 15:11:52,070 [INFO] Gráfico gerado: data/reports/grafico_financeiro.png
+2025-11-25 15:11:52,087 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
+2025-11-25 15:11:52,087 [INFO] Relatório Excel gerado: data/reports/relatorio_financeiro.xlsx
+2025-11-25 15:11:52,087 [INFO] Iniciando geração do PDF avançado...
+2025-11-25 15:11:52,197 [INFO] PDF gerado com sucesso em: data/reports/relatorio_financeiro.pdf
+2025-11-25 15:11:52,197 [INFO] PDF gerado com sucesso.
+2025-11-25 15:11:52,198 [INFO] Processamento concluído com sucesso.
+2025-11-25 15:19:11,152 [INFO] Iniciando processamento financeiro...
+2025-11-25 15:19:11,155 [INFO] config.yaml carregado com sucesso.
+2025-11-25 15:19:11,182 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 15:19:11,183 [INFO] 1 arquivos carregados.
+2025-11-25 15:19:11,183 [INFO] Colunas validadas com sucesso.
+2025-11-25 15:19:11,183 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 15:19:11,183 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 15:19:11,210 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 15:19:11,212 [INFO] Calculando métricas financeiras...
+2025-11-25 15:19:11,212 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 15:19:11,213 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 15:19:11,218 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 15:19:11,278 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 15:19:11,826 [INFO] Grafico salvo em: data\reports\grafico_financeiro.png
+2025-11-25 15:19:11,827 [INFO] Gráfico gerado: data/reports/grafico_financeiro.png
+2025-11-25 15:19:11,869 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
+2025-11-25 15:19:11,869 [INFO] Relatório Excel gerado: data/reports/relatorio_financeiro.xlsx
+2025-11-25 15:19:11,869 [INFO] Iniciando geração do PDF avançado...
+2025-11-25 15:19:11,943 [INFO] PDF gerado com sucesso em: data/reports/relatorio_financeiro.pdf
+2025-11-25 15:19:11,944 [INFO] PDF gerado com sucesso.
+2025-11-25 15:19:11,944 [INFO] Processamento concluído com sucesso.
+2025-11-25 15:24:12,835 [INFO] Iniciando processamento financeiro...
+2025-11-25 15:24:12,837 [INFO] config.yaml carregado com sucesso.
+2025-11-25 15:24:12,858 [INFO] Carregado: teste_financeiro.xlsx (3 linhas)
+2025-11-25 15:24:12,858 [INFO] 1 arquivos carregados.
+2025-11-25 15:24:12,859 [INFO] Colunas validadas com sucesso.
+2025-11-25 15:24:12,859 [INFO] Arquivo validado: teste_financeiro.xlsx
+2025-11-25 15:24:12,860 [INFO] Iniciando consolidação dos DataFrames...
+2025-11-25 15:24:12,915 [INFO] Consolidação concluída: 3 linhas finais.
+2025-11-25 15:24:12,917 [INFO] Calculando métricas financeiras...
+2025-11-25 15:24:12,920 [INFO] Métricas calculadas: {'faturamento_total': 7500.0, 'custos_totais': 4700.0, 'lucro_total': 2800.0, 'lucro_percentual': 37.33}
+2025-11-25 15:24:12,920 [INFO] Preparando dados para gráfico financeiro...
+2025-11-25 15:24:12,930 [INFO] 3 pontos de dados gerados para o gráfico.
+2025-11-25 15:24:13,094 [INFO] Arquivo consolidado salvo em: data/processed/dados_processados.xlsx
+2025-11-25 15:24:13,692 [INFO] Grafico salvo em: data\reports\grafico_financeiro.png
+2025-11-25 15:24:13,692 [INFO] Gráfico gerado: data/reports/grafico_financeiro.png
+2025-11-25 15:24:13,723 [INFO] Relatório Excel gerado: data\reports\relatorio_financeiro.xlsx
+2025-11-25 15:24:13,724 [INFO] Relatório Excel gerado: data/reports/relatorio_financeiro.xlsx
+2025-11-25 15:24:13,724 [INFO] Iniciando geração do PDF avançado...
+2025-11-25 15:24:13,816 [INFO] PDF gerado com sucesso em: data/reports/relatorio_financeiro.pdf
+2025-11-25 15:24:13,817 [INFO] PDF gerado com sucesso.
+2025-11-25 15:24:13,817 [INFO] Processamento concluído com sucesso.

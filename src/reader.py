@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from openpyxl import load_workbook
 from src.logger import get_logger
-from src.transformer import normalize_columns
+from src.transformer import normalize_columns # Dependência externa
 
 logger = get_logger()
 
@@ -14,7 +14,7 @@ def load_excel_files(folder_path: str) -> dict:
 
     Regras:
     - Diretório inexistente → FileNotFoundError
-    - Arquivo excel vazio → DataFrame vazio (para testes)
+    - Arquivo excel vazio → Lança ValueError (CORREÇÃO para atender ao teste)
     - Qualquer outro erro → Exception
     """
     if not os.path.exists(folder_path):
@@ -32,14 +32,21 @@ def load_excel_files(folder_path: str) -> dict:
         full_path = os.path.join(folder_path, file)
 
         try:
+            # Usando openpyxl, que é mais robusto para ler a estrutura de arquivos vazios
             wb = load_workbook(full_path, data_only=True)
             sheet = wb.active
             rows = list(sheet.values)
 
-            # arquivo vazio
+            # --- CORREÇÃO DE LÓGICA DE NEGÓCIO ---
+            # O teste unitário exige que um arquivo vazio lance ValueError.
             if not rows or len(rows) < 2:
-                logger.warning(f"Arquivo vazio ou sem dados: {file}")
-                df = pd.DataFrame()
+                logger.warning(f"Arquivo vazio ou sem dados: {file}. Lançando ValueError.")
+                
+                # 🚨 CORREÇÃO: Lança a exceção esperada pelo teste unitário.
+                raise ValueError(f"O arquivo Excel '{file}' está vazio ou sem dados (cabeçalho e pelo menos 1 linha de dados).")
+            
+            # --- FIM DA CORREÇÃO ---
+            
             else:
                 header = rows[0]
                 data = rows[1:]
@@ -51,8 +58,15 @@ def load_excel_files(folder_path: str) -> dict:
             result[file] = df
             logger.info(f"Carregado: {file} ({len(df)} linhas)")
 
+        except ValueError as ve:
+            # Captura o ValueError lançado acima e continua o loop para o próximo arquivo.
+            # (O teste unitário vai capturar este raise, mas no pipeline real, 
+            # você pode querer apenas logar e ignorar o arquivo, dependendo da regra de negócio.)
+            logger.error(f"Erro de Validação (Arquivo Vazio) ao carregar {file}: {ve}")
+            raise # Re-lança o ValueError para que o teste o capture
+            
         except Exception as e:
-            logger.error(f"Erro ao carregar {file}: {e}")
+            logger.error(f"Erro inesperado ao carregar {file}: {e}")
             raise
 
     return result

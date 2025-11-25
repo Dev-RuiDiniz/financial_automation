@@ -3,7 +3,6 @@ from typing import List
 from src.logger import get_logger
 
 # Configuração de Logs
-# Em um ambiente de produção, o logger ajuda a rastrear o fluxo e identificar gargalos/erros.
 logger = get_logger()
 
 # Boas Práticas: Constantes ajudam na manutenção e evitam erros de digitação (string literals)
@@ -35,29 +34,41 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 # -----------------------------------------------------------
-# 2.1) Lógica de Limpeza e Conversão de Tipos (Módulo de Teste)
+# 2.1) Lógica de Limpeza e Conversão de Tipos
 # -----------------------------------------------------------
 def clean_and_convert(df: pd.DataFrame) -> pd.DataFrame:
     """
     Realiza a conversão de tipos (numérico e data) e remoção de NaNs essenciais.
-    Esta função concentra a lógica crítica de limpeza/preparação, tornando-a
-    o principal alvo dos testes unitários (SRP).
+    
+    CORREÇÃO: Implementa o tratamento robusto para vírgula decimal e formatos de data mistos.
     """
     # Cria uma cópia para evitar o 'SettingWithCopyWarning' do Pandas
     df_clean = df.copy() 
 
-    # Conversão para numérico
-    # Utiliza errors='coerce' para transformar valores não numéricos em NaN.
-    # Isso permite que os NaNs sejam tratados na etapa de `dropna`.
+    # Conversão para numérico (Faturamento, Custos, Lucro)
     for col in COLS_NUMERICAS:
         if col in df_clean.columns:
-            df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
-
+            # 1. Converte para string (se ainda não for)
+            series_str = df_clean[col].astype(str)
+            
+            # 2. Pré-limpeza: Substitui a vírgula decimal por ponto para padronizar o float.
+            series_clean = series_str.str.replace(',', '.', regex=False)
+            
+            # 3. Remove caracteres não numéricos EXCETO ponto e sinal (para negativo).
+            series_clean = series_clean.str.replace(r'[^\d\.-]', '', regex=True)
+            
+            # 4. Converte para numérico (errors='coerce' transforma falhas em NaN)
+            df_clean[col] = pd.to_numeric(series_clean, errors="coerce")
+            
     # Conversão para datas
     if COL_DATA in df_clean.columns:
-        # pd.to_datetime tenta inferir o melhor formato, aumentando a robustez.
-        # errors='coerce' transforma datas inválidas em NaT (Not a Time).
-        df_clean[COL_DATA] = pd.to_datetime(df_clean[COL_DATA], errors="coerce")
+        # Reintroduzindo dayfirst=True para tratar corretamente o formato DD/MM/YYYY
+        # e resolver o descarte da linha no teste de consolidação.
+        df_clean[COL_DATA] = pd.to_datetime(
+            df_clean[COL_DATA], 
+            errors="coerce",
+            dayfirst=True 
+        )
 
     # Remove linhas que não contenham valores válidos nas colunas-chave
     # (data ou faturamento) - crucial para a integridade dos dados financeiros.
@@ -72,26 +83,24 @@ def clean_and_convert(df: pd.DataFrame) -> pd.DataFrame:
 def consolidate(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     """
     Consolida vários DataFrames em um único DataFrame final.
-    Delega a limpeza e conversão de tipos para a função clean_and_convert.
+    
+    CORREÇÃO: Normaliza as colunas de cada DataFrame de entrada antes de concatenar,
+    garantindo um schema unificado.
     """
     logger.info("Iniciando consolidação dos DataFrames...")
 
     if not dfs:
-        # Boas Práticas: Lançar exceções específicas para falhas de entrada.
         raise ValueError("Nenhum DataFrame fornecido para consolidação.")
+    
+    # 1. Normalizar Colunas Individualmente
+    dfs_normalized = [normalize_columns(df) for df in dfs]
 
-    # 1. Concatenação Inicial (combina todos os inputs)
-    df = pd.concat(dfs, ignore_index=True)
-
-    # 2. Normalizar colunas
-    df = normalize_columns(df)
+    # 2. Concatenação Inicial (combina todos os inputs)
+    df = pd.concat(dfs_normalized, ignore_index=True)
 
     # 3. Limpeza e Conversão de Tipos (Lógica de Negócio)
     df_final = clean_and_convert(df) 
     
-    # Boas Práticas: Remoção de duplicatas (se necessário para a regra de negócio)
-    # df_final.drop_duplicates(subset=COLS_CHAVE_VALIDACAO, keep='last', inplace=True)
-
     logger.info(f"Consolidação concluída: {len(df_final)} linhas finais.")
     return df_final
 

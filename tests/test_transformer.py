@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 # Importe todas as funções e constantes necessárias do módulo transformer.py
 # OBS: Ajuste a importação (ex: from src.transformer import ...) se seu arquivo .py estiver em src/
-from transformer import (
+from src.transformer import (
     normalize_columns,
     consolidate,
     calculate_metrics,
