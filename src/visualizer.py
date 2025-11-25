@@ -1,56 +1,35 @@
-import plotly.graph_objects as go
+# visualizer.py
+import matplotlib.pyplot as plt
 from pathlib import Path
-
 
 def generate_plot(df, output_path: str):
     """
-    Gera um gráfico de linha com Faturamento e Custos ao longo do tempo.
-    O formato é decidido pela extensão do arquivo:
-      - .png  → salva como imagem
-      - .html → salva como arquivo interativo
+    Gera um gráfico de linha usando Matplotlib (faturamento x custos)
+    e salva como imagem PNG.
     """
-
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
-    if "data" not in df.columns:
-        raise ValueError("A coluna 'data' é obrigatória para gerar o gráfico.")
+    # Criar figura
+    plt.figure(figsize=(10, 5))
 
-    if not {"faturamento", "custos"}.issubset(df.columns):
-        raise ValueError("As colunas 'faturamento' e 'custos' são obrigatórias.")
+    # Plota as linhas
+    plt.plot(df["data"], df["faturamento"], marker="o", label="Faturamento")
+    plt.plot(df["data"], df["custos"], marker="o", label="Custos")
 
-    fig = go.Figure()
+    # Ajustes visuais
+    plt.title("Faturamento x Custos")
+    plt.xlabel("Data")
+    plt.ylabel("Valores (R$)")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.legend()
 
-    # Linha de faturamento
-    fig.add_trace(go.Scatter(
-        x=df["data"],
-        y=df["faturamento"],
-        mode="lines",
-        name="Faturamento"
-    ))
+    # Rotacionar datas
+    plt.xticks(rotation=45)
 
-    # Linha de custos
-    fig.add_trace(go.Scatter(
-        x=df["data"],
-        y=df["custos"],
-        mode="lines",
-        name="Custos"
-    ))
+    # Salvar imagem
+    plt.tight_layout()
+    plt.savefig(out, format="png")
+    plt.close()
 
-    fig.update_layout(
-        title="Faturamento vs Custos",
-        xaxis_title="Data",
-        yaxis_title="Valor (R$)",
-        template="plotly_white",
-        hovermode="x unified"
-    )
-
-    # Escolhe formato
-    if out.suffix == ".html":
-        fig.write_html(str(out))
-    elif out.suffix == ".png":
-        fig.write_image(str(out))
-    else:
-        raise ValueError("Formato inválido. Use .png ou .html")
-
-    return str(out)
+    print(f"✔ Gráfico salvo em: {out}")
