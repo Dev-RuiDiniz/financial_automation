@@ -150,10 +150,8 @@ def main():
     try:
         run_pipeline()
     except Exception:
-        # 🛑 A exceção mais grave já foi logada como CRITICAL dentro de run_pipeline.
-        # Aqui, garantimos apenas uma saída limpa e evitamos rastreamentos desnecessários.
         logger.error("A execução do pipeline foi interrompida. Consulte o log para ERROS CRÍTICOS (CRITICAL).")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # 👈 Esta linha garante que main() só é chamado ao rodar o script
     main()
