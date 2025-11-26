@@ -3,9 +3,10 @@ import pytest
 from numpy import dtype
 import numpy as np 
 import logging
+# Importação necessária para o novo teste:
+from pandas.testing import assert_frame_equal 
 
 # Configuração básica de logging para o ambiente de teste
-# Isso permite que as mensagens logger.info() dentro dos testes sejam exibidas
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -16,6 +17,7 @@ from src.transformer import (
     consolidate,
     calculate_metrics,
     clean_and_convert,
+    prepare_chart_data, # Adicionada a importação de prepare_chart_data
     COL_DATA,
     COL_FATURAMENTO,
     COL_CUSTOS,
@@ -98,8 +100,7 @@ def test_clean_and_convert_lida_com_tipos_invalidos_e_nans():
         
     # C. Verificação dos Valores Convertidos (Para garantir a precisão)
     assert df_limpo[COL_FATURAMENTO].iloc[0] == pytest.approx(100.50)
-    # Garante que a conversão de strings numéricas funcionou (ex: "200,75" ou "R$300" seriam float)
-    # Nota: O código atual usa errors='coerce', logo "R$300" vira NaN (removido) e "200,75" vira 200.75
+    # Garante que a conversão de strings numéricas funcionou (ex: "200,75" vira 200.75)
     assert df_limpo[COL_FATURAMENTO].iloc[1] == pytest.approx(200.75)
     
     logger.info("Teste de limpeza e conversão (clean_and_convert) concluído com sucesso.")
@@ -219,3 +220,49 @@ def test_calculate_metrics_faturamento_zero():
         "O lucro percentual deveria ser 0.0 quando o faturamento é 0."
         
     logger.info("Teste com faturamento zero concluído com sucesso.")
+
+
+# -----------------------------------------------------------
+# V. Testes de Agregação de Gráficos (prepare_chart_data) - NOVA TAREFA
+# -----------------------------------------------------------
+def test_prepare_chart_data_agrupamento():
+    """
+    Testa se prepare_chart_data agrupa corretamente faturamento, custos e lucro por dia
+    e se o resultado está ordenado pela data.
+    """
+    logger.info("Executando teste de agregação de dados para gráfico (prepare_chart_data)...")
+
+    # 1. Setup: Dados desordenados e com datas duplicadas
+    data_desorganizada = {
+        COL_DATA: ["2024-01-02", "2024-01-01", "2024-01-01", "2023-12-31"],
+        COL_FATURAMENTO: [300.0, 100.0, 200.0, 50.0],
+        COL_CUSTOS: [50.0, 10.0, 20.0, 5.0],
+        COL_LUCRO: [250.0, 90.0, 180.0, 45.0],
+        "outra_coluna": [1, 2, 3, 4] # Coluna irrelevante que deve ser ignorada
+    }
+    df_input = pd.DataFrame(data_desorganizada)
+    # Garante que a coluna de data esteja no formato datetime (como seria após clean_and_convert)
+    df_input[COL_DATA] = pd.to_datetime(df_input[COL_DATA])
+    
+    # 2. Action
+    df_chart = prepare_chart_data(df_input)
+
+    # 3. Assertion: Construção do DataFrame esperado (agregado e ordenado)
+    data_esperada = {
+        COL_DATA: ["2023-12-31", "2024-01-01", "2024-01-02"],
+        COL_FATURAMENTO: [50.0, 300.0, 300.0],  # 100 + 200 = 300
+        COL_CUSTOS: [5.0, 30.0, 50.0],          # 10 + 20 = 30
+        COL_LUCRO: [45.0, 270.0, 250.0],        # 90 + 180 = 270
+    }
+    df_expected = pd.DataFrame(data_esperada)
+    df_expected[COL_DATA] = pd.to_datetime(df_expected[COL_DATA])
+    
+    # Compara os DataFrames. assert_frame_equal garante que a ordem, colunas e dtypes sejam idênticos.
+    assert_frame_equal(df_chart, df_expected, check_dtype=True)
+
+    # Teste para exceção: O que acontece se uma coluna essencial estiver faltando?
+    df_missing_col = df_input.drop(columns=[COL_FATURAMENTO])
+    with pytest.raises(ValueError, match=f"Coluna obrigatória faltando para o gráfico: {COL_FATURAMENTO}"):
+        prepare_chart_data(df_missing_col)
+        
+    logger.info("Teste de agregação de dados para gráfico (prepare_chart_data) concluído com sucesso.")
