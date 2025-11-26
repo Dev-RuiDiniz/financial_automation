@@ -17,4 +17,5 @@ financial_automation/
 ├── requirements.txt
 ├── README.md
 ├── config.yaml
+├── setup.py               # Configuração de deploy CLI (financial-report)
 └── main.py                # Pipeline principal
