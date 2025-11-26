@@ -5,17 +5,24 @@ from src.transformer import COL_DATA, COL_FATURAMENTO, COL_CUSTOS, COL_LUCRO # I
 
 logger = get_logger()
 
-def generate_excel_report(df: pd.DataFrame, reports_path: str):
+# ⚠️ A FUNÇÃO FOI ATUALIZADA PARA RECEBER OS FORMATOS ⚠️
+def generate_excel_report(
+    df: pd.DataFrame, 
+    reports_path: str,
+    currency_fmt: str,  # Novo argumento para o formato de moeda
+    date_fmt: str       # Novo argumento para o formato de data
+):
     """
     Gera um relatório Excel profissional contendo os dados processados e 
-    aplica formatação de moeda e data usando o motor xlsxwriter.
+    aplica formatação de moeda e data usando o motor xlsxwriter, 
+    baseado em formatos de configuração.
     """
     output_file = os.path.join(reports_path, "relatorio_financeiro.xlsx")
     
     # 1. Cria um objeto ExcelWriter usando o motor xlsxwriter
-    # O xlsxwriter é ideal para aplicar formatação detalhada.
+    # Usa o formato de data flexível (date_fmt)
     try:
-        writer = pd.ExcelWriter(output_file, engine='xlsxwriter', datetime_format='dd/mm/yyyy')
+        writer = pd.ExcelWriter(output_file, engine='xlsxwriter', datetime_format=date_fmt)
     except Exception as e:
         logger.error(f"Erro ao iniciar ExcelWriter com xlsxwriter: {e}")
         raise
@@ -29,12 +36,12 @@ def generate_excel_report(df: pd.DataFrame, reports_path: str):
     
     # 3. Define Formatos
     
-    # Formato de Moeda (Ex: R$ 1.000,00)
+    # Formato de Moeda (usa o argumento currency_fmt)
     # Formato de Moeda é crucial para COL_FATURAMENTO, COL_CUSTOS e COL_LUCRO
-    currency_format = workbook.add_format({'num_format': 'R$ #,##0.00'})
+    currency_format = workbook.add_format({'num_format': currency_fmt})
     
-    # Formato de Data (Já definido no ExcelWriter, mas é bom ter o formato explícito)
-    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+    # Formato de Data (usa o argumento date_fmt)
+    date_format = workbook.add_format({'num_format': date_fmt})
     
     # 4. Aplica os Formatos
     

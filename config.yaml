@@ -1,10 +1,28 @@
-paths:
-  raw: "data/raw"
-  processed: "data/processed"
-  reports: "data/reports"
+# ======================================================================
+# CONFIGURAÇÕES GERAIS DO PIPELINE
+# ======================================================================
 
+paths:
+    # 🟢 Diretórios de entrada e saída (usados pelo main.py)
+    raw: "data/raw"
+    processed: "data/processed"
+    reports: "data/reports"
+    
 columns:
-  required:
-    - data
-    - faturamento
-    - custos
+    # 🟢 Colunas necessárias para a validação (usadas pelo main.py)
+    required:
+        - data
+        - faturamento
+        - custos
+
+# ======================================================================
+# CONFIGURAÇÕES DE RELATÓRIOS (Task de Flexibilidade)
+# ======================================================================
+
+report_settings:
+    # 🟢 Formatação de Excel (usada pelo excel_generator.py)
+    currency_format: "R$ #,##0.00"
+    date_format: "dd/mm/yyyy"
+    
+    # 🟢 Outras configurações (usadas pelo pdf_generator.py ou main.py)
+    pdf_title: "Relatório Financeiro Consolidado"
