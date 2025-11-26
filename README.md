@@ -27,29 +27,27 @@ Ideal para operações repetitivas, rotinas contábeis, controle de vendas e aud
 ---
 ## 📂 Estrutura do Projeto
 ```.
+financial_automation/
 ├── data/
-│   ├── raw/                   # Planilhas de entrada (.xlsx)
-│   ├── processed/             # DataFrame consolidado (saída do transformer)
-│   └── reports/               # Saídas geradas (PDF, Excel, gráficos)
-│
+│   ├── raw/               # Arquivos Excel de entrada
+│   ├── processed/         # Dados tratados
+│   └── reports/           # PDFs e Excel finais
 ├── src/
-│   ├── reader.py              # Leitura e validação dos arquivos
-│   ├── transformer.py         # Consolidação e cálculos financeiros
-│   ├── visualizer.py          # Geração dos gráficos PNG
-│   ├── pdf_generator.py       # Relatório PDF
-│   ├── excel_generator.py     # Consolidação em Excel
-│   └── main.py                # Pipeline principal
-│
+│   ├── __init__.py
+│   ├── reader.py          # Funções de leitura e validação
+│   ├── transformer.py     # Cálculos e consolidação
+│   ├── visualizer.py      # Gráficos Plotly
+│   ├── pdf_generator.py   # Relatório PDF
+│   ├── excel_generator.py
+│   └──logger.py    
 ├── tests/
-│   ├── test_reader.py         
-│   ├── test_transformer.py
-│   ├── test_visualizer.py
-│   ├── test_excel_generator.py
-│   └── test_pdf_generator.py
-│
-├── config.yaml                # 🆕 Arquivo de Configuração Principal
+│   ├── conftest.py
+│   └── test_reader.py
 ├── requirements.txt
-└── README.md
+├── README.md
+├── config.yaml
+├── setup.py               # Configuração de deploy CLI (financial-report)
+└── main.py                # Pipeline principal
 ```
 ---
 ## ▶ Como Rodar o Projeto
