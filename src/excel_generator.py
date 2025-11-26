@@ -1,62 +1,82 @@
 import pandas as pd
+import pytest
 import os
+from openpyxl import load_workbook
+from pandas.testing import assert_frame_equal # Adicionar se ainda não estiver
+from src.excel_generator import generate_excel_report
+from src.transformer import COL_DATA, COL_FATURAMENTO, COL_CUSTOS, COL_LUCRO
 from src.logger import get_logger
-from src.transformer import COL_DATA, COL_FATURAMENTO, COL_CUSTOS, COL_LUCRO # Importando constantes
 
 logger = get_logger()
 
-def generate_excel_report(df: pd.DataFrame, reports_path: str):
-    """
-    Gera um relatório Excel profissional contendo os dados processados e 
-    aplica formatação de moeda e data usando o motor xlsxwriter.
-    """
-    output_file = os.path.join(reports_path, "relatorio_financeiro.xlsx")
-    
-    # 1. Cria um objeto ExcelWriter usando o motor xlsxwriter
-    # O xlsxwriter é ideal para aplicar formatação detalhada.
-    try:
-        writer = pd.ExcelWriter(output_file, engine='xlsxwriter', datetime_format='dd/mm/yyyy')
-    except Exception as e:
-        logger.error(f"Erro ao iniciar ExcelWriter com xlsxwriter: {e}")
-        raise
+# -----------------------------------------------------------
+# Teste Funcional: Geração de Relatório Excel Formatado
+# -----------------------------------------------------------
 
-    # 2. Escreve o DataFrame na planilha
-    df.to_excel(writer, sheet_name='Dados Financeiros', index=False)
+def test_generate_excel_report_with_formatting(tmp_path):
+    """
+    Testa se generate_excel_report cria o arquivo Excel e aplica a formatação
+    de número (moeda) e data.
+    """
+    logger.info("Executando teste funcional de geração de Excel formatado...")
+
+    # 1. Setup: Dados de entrada
+    df_data = {
+        COL_DATA: pd.to_datetime(["2024-01-01", "2024-01-02"]),
+        COL_FATURAMENTO: [1500.75, 2000.00],
+        COL_CUSTOS: [500.00, 1000.00],
+        COL_LUCRO: [1000.75, 1000.00]
+    }
+    df_input = pd.DataFrame(df_data)
+
+    # 2. Action
+    # reports_path é um objeto Path do Pytest. 
+    # Usamos str(tmp_path) para passar a string do diretório, o que é esperado
+    # pela sua função (que usa os.path.join internamente).
+    reports_path_str = str(tmp_path)
+    output_file = os.path.join(reports_path_str, "relatorio_financeiro.xlsx")
     
-    # Obtém o objeto workbook e worksheet do xlsxwriter
-    workbook = writer.book
-    worksheet = writer.sheets['Dados Financeiros']
-    
-    # 3. Define Formatos
-    
-    # Formato de Moeda (Ex: R$ 1.000,00)
-    # Formato de Moeda é crucial para COL_FATURAMENTO, COL_CUSTOS e COL_LUCRO
-    currency_format = workbook.add_format({'num_format': 'R$ #,##0.00'})
-    
-    # Formato de Data (Já definido no ExcelWriter, mas é bom ter o formato explícito)
-    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
-    
-    # 4. Aplica os Formatos
-    
-    # A. Aplica o formato de Moeda
-    for col_name in [COL_FATURAMENTO, COL_CUSTOS, COL_LUCRO]:
-        try:
-            # Encontra a coluna no Excel (o Pandas usa indexação baseada em 0)
-            col_index = df.columns.get_loc(col_name)
-            # Aplica o formato à coluna inteira, exceto o cabeçalho (começa da linha 1)
-            worksheet.set_column(col_index, col_index, None, currency_format)
-        except KeyError:
-            logger.warning(f"Coluna '{col_name}' não encontrada no DataFrame para formatação.")
+    # Executa a função que gera o relatório formatado
+    generate_excel_report(df_input, reports_path_str) 
+
+    # 3. Assertion: Verificação do Arquivo e Formatação
+
+    # A. Verificação de Existência
+    assert os.path.exists(output_file), \
+        f"O arquivo Excel esperado não foi criado em: {output_file}"
+        
+    # B. Leitura e Inspeção de Formatação com openpyxl
+    try:
+        # Usa o caminho ABSOLUTO para carregar a planilha
+        workbook = load_workbook(output_file)
+        worksheet = workbook['Dados Financeiros']
+        
+        # -------------------------------------------------
+        # B1. Verificação da Formatação de Data (A2)
+        date_cell = worksheet['A2']
+        # O xlsxwriter/openpyxl costuma mapear 'dd/mm/yyyy' para o formato numérico 14 
+        # ou mantém a string. Verificamos se contém a formatação esperada.
+        expected_date_format_part = 'dd/mm/yyyy' 
+        
+        # Verificamos se a string de formato contém o padrão esperado.
+        assert expected_date_format_part in date_cell.number_format.lower(), \
+            f"Formato de data incorreto na célula {COL_DATA}. Encontrado: {date_cell.number_format}"
+
+        # -------------------------------------------------
+        # B2. Verificação da Formatação de Moeda (B2)
+        currency_cell = worksheet['B2']
+        expected_currency_part = 'R$ ' 
+        
+        # Verificamos a presença do símbolo R$ no formato
+        assert expected_currency_part in currency_cell.number_format, \
+            f"Formato de moeda incorreto na célula {COL_FATURAMENTO}. Encontrado: {currency_cell.number_format}"
+
+        # C. Verificação do Valor Numérico (Crucial)
+        # O valor deve ser um número, não uma string formatada.
+        assert currency_cell.value == 1500.75, \
+            "O valor numérico na célula de faturamento está incorreto."
             
-    # B. Aplica o formato de Data
-    try:
-        col_index = df.columns.get_loc(COL_DATA)
-        # O formato de data já foi setado no ExcelWriter, mas aplicamos explicitamente:
-        worksheet.set_column(col_index, col_index, 12, date_format) # 12 é a largura da coluna
-    except KeyError:
-        logger.warning(f"Coluna '{COL_DATA}' não encontrada no DataFrame para formatação.")
-
-    # 5. Salva o arquivo Excel
-    writer.close()
-    
-    logger.info(f"Relatório Excel profissional gerado com formatação em: {output_file}")
+    except Exception as e:
+        pytest.fail(f"Falha ao ler o Excel gerado para inspeção de formatação: {e}")
+        
+    logger.info("Teste de geração de Excel formatado concluído com sucesso.")
