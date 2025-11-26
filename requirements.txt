@@ -1,5 +1,7 @@
 pandas
 openpyxl
+xlsxwriter  # Se o xlsxwriter não estiver no pandas, é bom ter
+pyyaml
 matplotlib
 reportlab
 pytest
